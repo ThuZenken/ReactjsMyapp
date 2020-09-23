@@ -4,9 +4,21 @@ import TaskItem from "./TaskItem";
 class TaskList extends Component {
   render() {
     var task = this.props.task;
-    var eleTask = task.map((task, index) => {
-      return <TaskItem key={task.id} index={index} task={task} />;
-    });
+    if (task != null) {
+      var eleTask = task.map((task, index) => {
+        return (
+          <TaskItem
+            key={task.id}
+            index={index}
+            task={task}
+            onUpdateStatus={this.props.onUpdateStatus}
+            onDelete={this.props.onDelete}
+            onUpdate={this.props.onUpdate}
+          />
+        );
+      });
+    }
+
     return (
       <div className="row mt-15">
         <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">

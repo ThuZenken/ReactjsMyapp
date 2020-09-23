@@ -9,6 +9,7 @@ class App extends Component {
     this.state = {
       task: [],
       isDisplayForm: false,
+      taskEditing: null,
     };
   }
   componentWillMount() {
@@ -55,7 +56,7 @@ class App extends Component {
 
   onToggleForm = () => {
     this.setState({
-      isDisplayForm: !this.state.isDisplayForm,
+      isDisplayForm: true,
     });
   };
 
@@ -65,10 +66,77 @@ class App extends Component {
     });
   };
 
+  onSubmit = (data) => {
+    var { task } = this.state;
+    if (data === "") {
+      data.id = this.GennerateID();
+      task.push(data);
+    }
+    var index = this.findIndex(data.id);
+    task[index] = data;
+    this.setState({
+      task: task,
+    });
+    localStorage.setItem("task", JSON.stringify(task));
+    this.setState({
+      isDisplayForm: false,
+      taskEditing: null,
+    });
+  };
+
+  onUpdateStatus = (id) => {
+    var { task } = this.state;
+    var index = this.findIndex(id);
+    if (index !== -1) {
+      task[index].status = !task[index].status;
+
+      this.setState({
+        task: task,
+      });
+
+      localStorage.setItem("task", JSON.stringify(task));
+    }
+  };
+
+  onDelete = (id) => {
+    var { task } = this.state;
+    var index = this.findIndex(id);
+    if (index !== -1) {
+      task.splice(index, 1);
+      this.setState({
+        task: task,
+      });
+
+      localStorage.setItem("task", JSON.stringify(task));
+    }
+  };
+
+  findIndex = (id) => {
+    var result = -1;
+    var { task } = this.state;
+    task.forEach((task, index) => {
+      if (task.id === id) {
+        result = index;
+      }
+    });
+    return result;
+  };
+  onUpdate = (id) => {
+    var { task } = this.state;
+    var index = this.findIndex(id);
+    this.setState({
+      taskEditing: task[index],
+    });
+    this.onToggleForm();
+  };
   render() {
-    var { task, isDisplayForm } = this.state;
+    var { task, isDisplayForm, taskEditing } = this.state;
     var elmTaskForm = isDisplayForm ? (
-      <TaskForm onCloseForm={this.onCloseForm} />
+      <TaskForm
+        onSubmit={this.onSubmit}
+        onCloseForm={this.onCloseForm}
+        task={taskEditing}
+      />
     ) : (
       ""
     );
@@ -102,9 +170,21 @@ class App extends Component {
                 <span className="fa fa-plus mr-5" />
                 Add Task
               </button>
+              {/* <button
+                type="button"
+                className="btn btn-danger mb-5 mr-5"
+                onClick={this.GenerateData}
+              >
+                GenerateData
+              </button> */}
             </div>
             <Control />
-            <TaskList task={task} />
+            <TaskList
+              task={task}
+              onUpdateStatus={this.onUpdateStatus}
+              onDelete={this.onDelete}
+              onUpdate={this.onUpdate}
+            />
           </div>
         </div>
       </div>

@@ -4,15 +4,29 @@ class TaskForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: "",
       name: "",
       status: false,
     };
+  }
+
+  componentWillMount() {
+    if (this.props.task) {
+      this.setState({
+        id: this.props.task.id,
+        name: this.props.task.name,
+        status: this.props.task.status,
+      });
+    }
   }
 
   onChange = (event) => {
     var target = event.target;
     var name = target.name;
     var value = target.value;
+    if (name === "status") {
+      value = target.value === "false" ? false : true;
+    }
     this.setState({
       [name]: value,
     });
@@ -20,12 +34,38 @@ class TaskForm extends Component {
 
   onSubmit = (event) => {
     event.preventDefault();
-    console.log(this.state);
+    this.props.onSubmit(this.state);
   };
+
   onCloseForm = () => {
     this.props.onCloseForm();
   };
+
+  Cancel = () => {
+    this.setState({
+      name: "",
+      state: false,
+      errors: {},
+    });
+    this.props.onCloseForm();
+  };
+
+  handleValidation() {
+    let fields = this.state.fields;
+    let errors = {};
+    let formIsValid = true;
+
+    //Name
+    if (!fields["name"]) {
+      formIsValid = false;
+      errors["name"] = "Cannot be empty";
+    }
+    this.setState({ errors: errors });
+    return formIsValid;
+  }
+
   render() {
+    var { id } = this.state;
     return (
       <div className="panel panel-warning ">
         <div className="panel-heading">
@@ -37,7 +77,9 @@ class TaskForm extends Component {
               ></span>
             </div>
             <div className="text-left">
-              <h3 className="panel-title">Add Task</h3>
+              <h3 className="panel-title">
+                {id !== "" ? "Update Task" : "Add Task"}
+              </h3>
             </div>
           </div>
         </div>
@@ -51,6 +93,7 @@ class TaskForm extends Component {
                 name="name"
                 value={this.state.name}
                 onChange={this.onChange}
+                placeholder="Name"
               />
             </div>
             <label>Status :</label>
@@ -61,8 +104,8 @@ class TaskForm extends Component {
               value={this.state.status}
               onChange={this.onChange}
             >
-              <option value={1}>Activited</option>
-              <option value={0}>Hidden</option>
+              <option value={true}>Activited</option>
+              <option value={false}>Hidden</option>
             </select>
             <br />
             <div className="text-center">
@@ -70,7 +113,11 @@ class TaskForm extends Component {
                 Add
               </button>
               &nbsp;
-              <button type="submit" className="btn btn-danger">
+              <button
+                type="submit"
+                className="btn btn-danger"
+                onClick={this.Cancel}
+              >
                 Cancel
               </button>
             </div>
