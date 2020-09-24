@@ -3,6 +3,10 @@ import "./App.css";
 import TaskForm from "./Components/TaskForm";
 import Control from "./Components/Control";
 import TaskList from "./Components/TaskList";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import swal from "sweetalert";
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -12,6 +16,8 @@ class App extends Component {
       taskEditing: null,
     };
   }
+
+  //componetWillMount
   componentWillMount() {
     if (localStorage && localStorage.getItem) {
       var task = JSON.parse(localStorage.getItem("task"));
@@ -20,6 +26,8 @@ class App extends Component {
       });
     }
   }
+
+  //GenerateData
   GenerateData = () => {
     var task = [
       {
@@ -44,31 +52,77 @@ class App extends Component {
     localStorage.setItem("task", JSON.stringify(task));
   };
 
+  //RandomId
   s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
       .toString(16)
       .substring(1);
   }
 
+  //RandomId
   GennerateID() {
     return this.s4() + this.s4() + "-" + this.s4();
   }
+  //Alert confirm
+  alConfirm = (_title, _message, callback) => {
+    if (callback == null || callback === undefined) {
+      swal({
+        title: _title,
+        text: _message,
+        buttons: {
+          confirm: "Ok",
+          cancel: "Cancel",
+        },
+      });
+      return;
+    }
 
+    swal({
+      title: _title,
+      text: _message,
+      buttons: {
+        confirm: "Ok",
+        cancel: "Cancel",
+      },
+    }).then(function (e) {
+      callback(e);
+    });
+  };
+
+  //openToggleAdd
   onToggleForm = () => {
+    this.setState({
+      isDisplayForm: true,
+      taskEditing: null,
+    });
+  };
+
+  //openToggleEdit
+  onToggleFormEdit = () => {
     this.setState({
       isDisplayForm: true,
     });
   };
 
+  //CloseToggle
   onCloseForm = () => {
     this.setState({
       isDisplayForm: false,
     });
   };
 
+  onCancel = () => {
+    this.setState({
+      isDisplayForm: false,
+      taskEditing: "",
+    });
+  };
+
+  //SubmitForm
   onSubmit = (data) => {
     var { task } = this.state;
-    if (data === "") {
+    var idFirst = data.id;
+    if (data.id === "") {
       data.id = this.GennerateID();
       task.push(data);
     }
@@ -82,8 +136,14 @@ class App extends Component {
       isDisplayForm: false,
       taskEditing: null,
     });
+    if (idFirst === "") {
+      toast.success("Add Task Success");
+    } else {
+      toast.success("Update Task Success");
+    }
   };
 
+  //update Status
   onUpdateStatus = (id) => {
     var { task } = this.state;
     var index = this.findIndex(id);
@@ -98,17 +158,36 @@ class App extends Component {
     }
   };
 
+  //Remove Task
   onDelete = (id) => {
     var { task } = this.state;
-    var index = this.findIndex(id);
-    if (index !== -1) {
-      task.splice(index, 1);
-      this.setState({
-        task: task,
-      });
+    var task1;
+    this.alConfirm(
+      "Delete Task",
+      "Are you sure want to delete the Task？",
+      function (e) {
+        console.log(task);
+        debugger;
+        if (e) {
+          var index = -1;
+          task.forEach((task, ele) => {
+            if (task.id === id) {
+              index = ele;
+            }
+          });
 
-      localStorage.setItem("task", JSON.stringify(task));
-    }
+          if (index !== -1) {
+            task.splice(index, 1);
+            toast.success("Remove Task Success");
+          }
+          localStorage.setItem("task", JSON.stringify(task));
+          setTimeout(function () {
+            window.location.href = "./index.html";
+          }, 3000);
+        }
+        return task;
+      }
+    );
   };
 
   findIndex = (id) => {
@@ -127,7 +206,7 @@ class App extends Component {
     this.setState({
       taskEditing: task[index],
     });
-    this.onToggleForm();
+    this.onToggleFormEdit();
   };
   render() {
     var { task, isDisplayForm, taskEditing } = this.state;
@@ -136,6 +215,7 @@ class App extends Component {
         onSubmit={this.onSubmit}
         onCloseForm={this.onCloseForm}
         task={taskEditing}
+        onCancel={this.onCancel}
       />
     ) : (
       ""
@@ -179,6 +259,7 @@ class App extends Component {
               </button> */}
             </div>
             <Control />
+            {/* <swal /> */}
             <TaskList
               task={task}
               onUpdateStatus={this.onUpdateStatus}
@@ -187,6 +268,7 @@ class App extends Component {
             />
           </div>
         </div>
+        <ToastContainer />
       </div>
     );
   }

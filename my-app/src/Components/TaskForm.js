@@ -36,38 +36,17 @@ class TaskForm extends Component {
     event.preventDefault();
     this.props.onSubmit(this.state);
   };
-
   onCloseForm = () => {
     this.props.onCloseForm();
   };
 
   Cancel = () => {
-    this.setState({
-      name: "",
-      state: false,
-      errors: {},
-    });
-    this.props.onCloseForm();
+    this.props.onCancel();
   };
-
-  handleValidation() {
-    let fields = this.state.fields;
-    let errors = {};
-    let formIsValid = true;
-
-    //Name
-    if (!fields["name"]) {
-      formIsValid = false;
-      errors["name"] = "Cannot be empty";
-    }
-    this.setState({ errors: errors });
-    return formIsValid;
-  }
-
   render() {
     var { id } = this.state;
     return (
-      <div className="panel panel-warning ">
+      <div className="panel panel-warning  ">
         <div className="panel-heading">
           <div className="row">
             <div className="iconClose">
@@ -114,7 +93,7 @@ class TaskForm extends Component {
               </button>
               &nbsp;
               <button
-                type="submit"
+                type="button"
                 className="btn btn-danger"
                 onClick={this.Cancel}
               >
