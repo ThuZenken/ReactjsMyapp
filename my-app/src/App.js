@@ -14,6 +14,11 @@ class App extends Component {
       task: [],
       isDisplayForm: false,
       taskEditing: null,
+      filter: {
+        name: "",
+        status: -1,
+      },
+      keyword: "",
     };
   }
 
@@ -166,8 +171,6 @@ class App extends Component {
       "Delete Task",
       "Are you sure want to delete the Task？",
       function (e) {
-        console.log(task);
-        debugger;
         if (e) {
           var index = -1;
           task.forEach((task, ele) => {
@@ -208,8 +211,47 @@ class App extends Component {
     });
     this.onToggleFormEdit();
   };
+
+  onFilter = (filterName, filterStatus) => {
+    filterStatus = parseInt(filterStatus, 10);
+    this.setState({
+      filter: {
+        name: filterName.toLowerCase(),
+        status: filterStatus,
+      },
+    });
+  };
+
+  onSearch = (keyword) => {
+    this.setState({
+      keyword: keyword,
+    });
+
+    console.log(keyword);
+  };
   render() {
-    var { task, isDisplayForm, taskEditing } = this.state;
+    var { task, isDisplayForm, taskEditing, filter, keyword } = this.state;
+
+    if (filter) {
+      if (filter.name) {
+        task = task.filter((task) => {
+          return task.name.toLowerCase().indexOf(filter.name) !== -1;
+        });
+      }
+      task = task.filter((task) => {
+        if (filter.status === 0 || filter.status === 1) {
+          return task.status === (filter.status === 1 ? true : false);
+        } else {
+          return task;
+        }
+      });
+      if (keyword) {
+        task = task.filter((task) => {
+          return task.name.toLowerCase().indexOf(keyword) !== -1;
+        });
+      }
+    }
+
     var elmTaskForm = isDisplayForm ? (
       <TaskForm
         onSubmit={this.onSubmit}
@@ -258,13 +300,14 @@ class App extends Component {
                 GenerateData
               </button> */}
             </div>
-            <Control />
+            <Control onSearch={this.onSearch} />
             {/* <swal /> */}
             <TaskList
               task={task}
               onUpdateStatus={this.onUpdateStatus}
               onDelete={this.onDelete}
               onUpdate={this.onUpdate}
+              onFilter={this.onFilter}
             />
           </div>
         </div>

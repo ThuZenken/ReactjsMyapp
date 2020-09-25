@@ -46,7 +46,7 @@ class TaskForm extends Component {
   render() {
     var { id } = this.state;
     return (
-      <div className="panel panel-warning  ">
+      <div className="panel panel-warning">
         <div className="panel-heading">
           <div className="row">
             <div className="iconClose">
