@@ -3,6 +3,7 @@ import "./App.css";
 import TaskForm from "./Components/TaskForm";
 import Control from "./Components/Control";
 import TaskList from "./Components/TaskList";
+import Footer from "./Components/footer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import swal from "sweetalert";
@@ -312,6 +313,7 @@ class App extends Component {
           </div>
         </div>
         <ToastContainer />
+        <Footer />
       </div>
     );
   }
