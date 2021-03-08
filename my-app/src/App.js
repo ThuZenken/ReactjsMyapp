@@ -142,9 +142,9 @@ class App extends Component {
       taskEditing: null,
     });
     if (idFirst === "") {
-      toast.success("Add Task Success");
+      toast.success("New successfully added!");
     } else {
-      toast.success("Update Task Success");
+      toast.success("Update successful!");
     }
   };
 
@@ -181,7 +181,7 @@ class App extends Component {
 
           if (index !== -1) {
             task.splice(index, 1);
-            toast.success("Remove Task Success");
+            toast.success("Deleted successfully!");
           }
           localStorage.setItem("task", JSON.stringify(task));
           setTimeout(function () {
